@@ -17,7 +17,11 @@ docker_build:
 	docker build -t tuxeatpi_speech_nuance -f Dockerfile .
 
 docker_run:
-	docker run --rm tuxeatpi_speech_nuance
+	docker run --rm \
+    --net=host \
+    -v /run/user/`id -u`/pulse:/run/pulse:ro \
+    tuxeatpi_speech_nuance
+
 
 #######################################
 ### Documentation
