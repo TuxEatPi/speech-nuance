@@ -1,0 +1,2 @@
+-e git+https://github.com/titilambert/pynuance.git@aiohttp2#egg=pynuance
+-e git+https://github.com/TuxEatPi/common.git#egg=tuxeatpi-common

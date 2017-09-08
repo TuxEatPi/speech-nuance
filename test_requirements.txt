@@ -1,0 +1,10 @@
+# dev
+#mock==2.0.0
+#Sphinx==1.4.8
+#sphinx-rtd-theme==0.1.9
+#pycodestyle==2.0.0
+pylint
+pycodestyle
+pytest
+pytest-cov==2.5.1
+pytest-html==1.15.1
