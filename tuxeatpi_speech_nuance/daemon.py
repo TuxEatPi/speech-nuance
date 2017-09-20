@@ -22,6 +22,8 @@ class Speech(TepBaseDaemon):
         self.app_key = None
         self.codec = None
         self.voices = {}
+        self.is_speaking = None
+        self.set_state(False)
 
     def main_loop(self):
         """Main loop.
@@ -53,6 +55,18 @@ class Speech(TepBaseDaemon):
         if hasattr(self, 'voices'):
             return self.voices.get(self.settings.language)
 
+    def set_state(self, state):
+        """State indicate if the Tux is currently speaking
+
+        .. todo:: Set it as property
+        """
+        self.is_speaking = state
+        topic = "global/is_speaking"
+        data = {"arguments": {"state": state}}
+        message = Message(topic=topic, data=data)
+        self.logger.info("Publish %s with argument %s", message.topic, message.payload)
+        self.publish(message)
+
     @is_mqtt_topic("say")
     def say(self, text):
         """Say a text using Nuance Communications Services"""
@@ -67,9 +81,13 @@ class Speech(TepBaseDaemon):
         message = Message(topic=topic, data=data)
         self.logger.info("Publish %s with argument %s", message.topic, message.payload)
         self.publish(message)
+        # Set state
+        self.set_state(True)
         # Say text
         tts.text_to_speech(self.app_id, self.app_key, self.settings.language,
                            self.voice, self.codec, text)
+        # Set state
+        self.set_state(False)
         # Enabling hotword
         topic = "hotword/enable"
         data = {"arguments": {}}
