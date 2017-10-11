@@ -5,7 +5,8 @@ import time
 
 from pynuance import tts
 
-from tuxeatpi_common.message import Message, is_mqtt_topic
+from tuxeatpi_common.message import Message
+from tuxeatpi_common.wamp import is_wamp_topic, is_wamp_rpc
 from tuxeatpi_common.error import TuxEatPiError
 from tuxeatpi_common.daemon import TepBaseDaemon
 
@@ -23,7 +24,7 @@ class Speech(TepBaseDaemon):
         self.codec = None
         self.voices = {}
         self.is_speaking = None
-        self.set_state(False)
+        # self.set_state(False)
 
     def main_loop(self):
         """Main loop.
@@ -67,7 +68,8 @@ class Speech(TepBaseDaemon):
         self.logger.info("Publish %s with argument %s", message.topic, message.payload)
         self.publish(message)
 
-    @is_mqtt_topic("say")
+    @is_wamp_rpc("say")
+    @is_wamp_topic("say")
     def say(self, text):
         """Say a text using Nuance Communications Services"""
         self.logger.info("speech/say called with argument: text=%s", text)
@@ -76,11 +78,7 @@ class Speech(TepBaseDaemon):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         # Disabling hotword
-        topic = "hotword/disable"
-        data = {"arguments": {}}
-        message = Message(topic=topic, data=data)
-        self.logger.info("Publish %s with argument %s", message.topic, message.payload)
-        self.publish(message)
+        self.call("hotword.disable")
         # Set state
         self.set_state(True)
         # Say text
@@ -89,18 +87,16 @@ class Speech(TepBaseDaemon):
         # Set state
         self.set_state(False)
         # Enabling hotword
-        topic = "hotword/enable"
-        data = {"arguments": {}}
-        message = Message(topic=topic, data=data)
-        self.logger.info("Publish %s with argument %s", message.topic, message.payload)
-        self.publish(message)
+        self.call("hotword.enable")
 
-    @is_mqtt_topic("test")
+    @is_wamp_rpc("test")
+    @is_wamp_topic("test")
     def test(self):
         """Test this component sayng something"""
         self.logger.info("speech/test called")
 
-    @is_mqtt_topic("help")
+    @is_wamp_rpc("help")
+    @is_wamp_topic("help")
     def help_(self):
         pass
 
