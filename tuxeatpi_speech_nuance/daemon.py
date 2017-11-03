@@ -62,7 +62,7 @@ class Speech(TepBaseDaemon):
         .. todo:: Set it as property
         """
         self.is_speaking = state
-        topic = "global/is_speaking"
+        topic = "speech.is_speaking"
         data = {"arguments": {"state": state}}
         message = Message(topic=topic, data=data)
         self.logger.info("Publish %s with argument %s", message.topic, message.payload)
@@ -72,7 +72,7 @@ class Speech(TepBaseDaemon):
     @is_wamp_topic("say")
     def say(self, text):
         """Say a text using Nuance Communications Services"""
-        self.logger.info("speech/say called with argument: text=%s", text)
+        self.logger.info("speech.say called with argument: text=%s", text)
         # Fix
         # RuntimeError: There is no current event loop in thread 'Thread-1'.
         self.loop = asyncio.new_event_loop()
@@ -93,7 +93,7 @@ class Speech(TepBaseDaemon):
     @is_wamp_topic("test")
     def test(self):
         """Test this component sayng something"""
-        self.logger.info("speech/test called")
+        self.logger.info("speech.test called")
 
     @is_wamp_rpc("help")
     @is_wamp_topic("help")
